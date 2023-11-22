@@ -1,7 +1,33 @@
 import Plot from "react-plotly.js";
+import { useEffect, useState } from "react";
+
+type SentimentOverview = {
+    name: string[];
+    sentMean: number[];
+    conPos: number[];
+    conNeg: number[];
+    mass: number[];
+};
 
 function Dashboard() {
-    const topics = ["Healhcare", "Education", "Environment", "Transport", "Housing"];
+    const [sentimentOverview, setSentimentOverview] = useState<SentimentOverview | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const fetchData = async () => {
+        const request = await fetch("http://localhost:8000/sentiment-overview");
+        const response = await request.json();
+        setSentimentOverview(response);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        if (sentimentOverview || loading) {
+            return;
+        }
+
+        setLoading(true);
+        fetchData().catch(console.log);
+    }, [sentimentOverview, loading]);
 
     return (
         <>
@@ -10,34 +36,46 @@ function Dashboard() {
                     <h1>Topic sentiment</h1>
                     <p>
                         The graph shows average sentiment, level of positive sentiment, level of
-                        negative sentiment and discussion volume.
+                        negative sentiment and discussion volume. The greater the yellow square, the
+                        more posts were published on the topic.
                     </p>
                     <div className="text-center">
                         <Plot
+                            className="sentiment-overview"
                             data={[
                                 {
-                                    x: topics,
-                                    y: [-0.2, -0.3, -0.5, -0.15, -0.4],
-                                    width: [0.85, 0.5, 0.5, 0.8, 0.5],
+                                    x: sentimentOverview?.name,
+                                    y: sentimentOverview?.conNeg,
                                     type: "bar",
                                     marker: { color: "#dc3545" },
                                     name: "Negative sentiment",
                                 },
                                 {
-                                    x: topics,
-                                    y: [0.8, 0.7, 0.5, 0.85, 0.6],
-                                    width: [0.85, 0.5, 0.5, 0.8, 0.5],
+                                    x: sentimentOverview?.name,
+                                    y: sentimentOverview?.conPos,
                                     type: "bar",
                                     marker: { color: "#28a745" },
                                     name: "Positive sentiment",
                                 },
                                 {
-                                    x: topics,
-                                    y: [0.2, 0.15, 0.3, 0.25, -0.05],
-                                    marker: { color: "#ffc107", size: 12, symbol: "square" },
+                                    x: sentimentOverview?.name,
+                                    y: sentimentOverview?.sentMean,
+                                    marker: {
+                                        color: "#ffc107",
+                                        size: sentimentOverview?.mass,
+                                        symbol: "square",
+                                    },
                                     name: "Average sentiment",
                                     type: "scatter",
-                                    mode: "markers"
+                                    mode: "markers",
+                                },
+                                {
+                                    x: sentimentOverview?.name,
+                                    y: sentimentOverview?.sentMean,
+                                    marker: { color: "#ffffff", size: 2, symbol: "square" },
+                                    type: "scatter",
+                                    showlegend: false,
+                                    mode: "markers",
                                 },
                             ]}
                             layout={{
@@ -45,8 +83,10 @@ function Dashboard() {
                                 paper_bgcolor: "#f8f9fa",
                                 plot_bgcolor: "#f8f9fa",
                                 barmode: "relative",
-                                margin: { t: 0, r: 0, l: 40, b: 18 },
+                                margin: { t: 0, r: 0, l: 39, b: 200 },
+                                xaxis: { tickangle: 45 },
                             }}
+                            config={{ responsive: true }}
                         />
                     </div>
                 </div>
