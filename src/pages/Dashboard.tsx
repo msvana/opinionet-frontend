@@ -112,6 +112,7 @@ function Dashboard() {
                                     barmode: "relative",
                                     margin: { t: 0, r: 0, l: 39, b: 200 },
                                     xaxis: { tickangle: 45 },
+                                    showlegend: false,
                                 }}
                                 config={{ responsive: true }}
                             />

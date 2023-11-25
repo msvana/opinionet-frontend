@@ -25,7 +25,7 @@ function App() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/" className="nav-link">
+                                <NavLink to="/topics" className="nav-link">
                                     Topics
                                 </NavLink>
                             </li>
