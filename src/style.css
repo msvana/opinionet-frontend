@@ -1,15 +1,27 @@
+html {
+    font-size: 14px;
+}
+
 body {
-	font-family: 'Arial', sans-serif;
+    font-family: "Arial", sans-serif;
 }
 
 h1 {
-	font-size: 1.8em;
+    font-size: 1.8em;
 }
 
 .sentiment-overview,
 .sentiment-overview .plot-container,
 .sentiment-overview .plot-container .svg-container {
-	width: 100% !important;
-	height: 550px;
+    width: 100% !important;
+    height: 550px;
 }
 
+.datatable-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    opacity: 0.3;
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
+import { TableRow } from "react-data-table-component";
 import { Link } from "react-router-dom";
 
 type Topic = {
@@ -10,15 +11,69 @@ type Topic = {
     mass: number;
 };
 
-async function fetctTopicsData(): Promise<Topic[]> {
+type TopicsResponse = {
+    topics: Topic[];
+    max: Topic;
+    topQuantile: Topic;
+    bottomQuantile: Topic;
+};
+
+async function fetctTopicsData(): Promise<TopicsResponse> {
     const request = await fetch(`http://localhost:8000/topics`);
     const response = await request.json();
-    return response.topics;
+    return response;
+}
+
+function formatTopicData(
+    statistic: "sentMean" | "conPos" | "conNeg" | "mass",
+    preferredDirection: "max" | "min",
+    topics: TopicsResponse | null
+) {
+    return function (row: TableRow) {
+        if (!topics) {
+            return "";
+        }
+
+        const statisticValue = row[statistic] as number;
+        let backgroundColor = "#007bff";
+
+        if (preferredDirection === "max" && statisticValue >= topics.topQuantile[statistic]) {
+            backgroundColor = "green";
+        } else if (
+            preferredDirection === "min" &&
+            statisticValue >= topics.topQuantile[statistic]
+        ) {
+            backgroundColor = "red";
+        } else if (
+            preferredDirection === "max" &&
+            statisticValue <= topics.bottomQuantile[statistic]
+        ) {
+            backgroundColor = "red";
+        } else if (
+            preferredDirection === "min" &&
+            statisticValue <= topics.bottomQuantile[statistic]
+        ) {
+            backgroundColor = "green";
+        }
+
+        return (
+            <>
+                <div
+                    className="datatable-bar"
+                    style={{
+                        width: `${(90 * statisticValue) / topics.max[statistic]}%`,
+                        backgroundColor: backgroundColor,
+                    }}
+                ></div>
+                {statisticValue.toFixed(3)}
+            </>
+        );
+    };
 }
 
 function Topics() {
     const [loading, setLoading] = useState<boolean>(false);
-    const [topics, setTopics] = useState<Topic[]>([]);
+    const [topics, setTopics] = useState<TopicsResponse | null>(null);
 
     async function fetchTopicsData() {
         const topicsData = await fetctTopicsData();
@@ -27,7 +82,7 @@ function Topics() {
     }
 
     useEffect(() => {
-        if (loading || topics.length > 0) {
+        if (loading || topics) {
             return;
         }
 
@@ -40,7 +95,10 @@ function Topics() {
             <div className="col">
                 <div className="bg-light border p-3">
                     <h1>Topics</h1>
-                    <p>The table lists all topics detected in tweets from Ostrava. Click the topic name to explore it in more detail.</p>
+                    <p>
+                        The table lists all topics detected in tweets from Ostrava. Click the topic
+                        name to explore it in more detail.
+                    </p>
                     <DataTable
                         columns={[
                             {
@@ -53,32 +111,34 @@ function Topics() {
                                 name: <b>Mean Sentiment</b>,
                                 selector: (row) => row.sentMean,
                                 sortable: true,
-                                format: (row) => row.sentMean.toFixed(3),
+                                format: formatTopicData("sentMean", "max", topics),
                             },
                             {
                                 name: <b>Positive Sentiment Level</b>,
                                 selector: (row) => row.conPos,
                                 sortable: true,
-                                format: (row) => row.conPos.toFixed(3),
+                                format: formatTopicData("conPos", "max", topics),
                             },
                             {
                                 name: <b>Negative Sentiment Level</b>,
                                 selector: (row) => row.conNeg,
                                 sortable: true,
-                                format: (row) => row.conNeg.toFixed(3),
+                                format: formatTopicData("conNeg", "min", topics),
                             },
                             {
                                 name: <b>Discussion Volume</b>,
                                 selector: (row) => row.mass,
                                 sortable: true,
-                                format: (row) => row.mass.toFixed(3),
+                                format: formatTopicData("mass", "max", topics),
                             },
                         ]}
-                        data={topics}
-                        striped={true}
+                        data={topics?.topics || []}
                         customStyles={{
                             head: { style: { fontSize: "1rem" } },
-                            rows: { style: { fontSize: "1rem" } },
+                            rows: { style: { fontSize: "1rem", background: "none" } },
+                            cells: { style: { zIndex: 1 } },
+                            headRow: { style: { background: "none" } },
+                            table: { style: { background: "none" } },
                         }}
                     />
                 </div>
