@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Topics from "./pages/Topics.tsx";
+import Topic from "./pages/Topic.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
             {
                 path: "/topics",
                 element: <Topics />,
+            },
+            {
+                path: "/topic/:topicId",
+                element: <Topic />,
             },
         ],
     },

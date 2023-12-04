@@ -4,6 +4,7 @@ import { TableRow } from "react-data-table-component";
 import { Link } from "react-router-dom";
 
 type Topic = {
+    id: number | null;
     name: string;
     sentMean: number;
     conPos: number;
@@ -103,7 +104,7 @@ function Topics() {
                         columns={[
                             {
                                 name: <b>Topic</b>,
-                                format: (row) => <Link to="/">{row.name}</Link>,
+                                format: (row) => <Link to={"/topic/" + row.id}>{row.name}</Link>,
                                 selector: (row) => row.name,
                                 grow: 2,
                             },

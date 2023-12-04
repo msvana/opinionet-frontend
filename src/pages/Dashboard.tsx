@@ -1,6 +1,7 @@
 import Plot from "react-plotly.js";
 import { useEffect, useState } from "react";
 import WordCloud from "react-d3-cloud";
+import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
 
 type SentimentOverview = {
     name: string[];
@@ -9,17 +10,6 @@ type SentimentOverview = {
     conNeg: number[];
     mass: number[];
 };
-
-type WordCloudData = {
-    text: string;
-    value: number;
-};
-
-async function fetchWordCloudData(sentiment: string): Promise<WordCloudData[]> {
-    const request = await fetch(`http://localhost:8000/wordcloud/${sentiment}`);
-    const response = await request.json();
-    return response.words;
-}
 
 async function fetchSentimentOverview(): Promise<SentimentOverview> {
     const request = await fetch("http://localhost:8000/sentiment-overview");
