@@ -5,9 +5,9 @@ import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
 
 type SentimentOverview = {
     name: string[];
-    sentMean: number[];
-    conPos: number[];
-    conNeg: number[];
+    meanSentiment: number[];
+    levelPositivity: number[];
+    levelNegativity: number[];
     mass: number[];
 };
 
@@ -62,21 +62,21 @@ function Dashboard() {
                                 data={[
                                     {
                                         x: sentimentOverview?.name,
-                                        y: sentimentOverview?.conNeg,
+                                        y: sentimentOverview?.levelNegativity,
                                         type: "bar",
                                         marker: { color: "#dc3545" },
                                         name: "Negative sentiment",
                                     },
                                     {
                                         x: sentimentOverview?.name,
-                                        y: sentimentOverview?.conPos,
+                                        y: sentimentOverview?.levelPositivity,
                                         type: "bar",
                                         marker: { color: "#28a745" },
                                         name: "Positive sentiment",
                                     },
                                     {
                                         x: sentimentOverview?.name,
-                                        y: sentimentOverview?.sentMean,
+                                        y: sentimentOverview?.meanSentiment,
                                         marker: {
                                             color: "#ffc107",
                                             size: sentimentOverview?.mass,
@@ -88,7 +88,7 @@ function Dashboard() {
                                     },
                                     {
                                         x: sentimentOverview?.name,
-                                        y: sentimentOverview?.sentMean,
+                                        y: sentimentOverview?.meanSentiment,
                                         marker: { color: "#ffffff", size: 2, symbol: "square" },
                                         type: "scatter",
                                         showlegend: false,

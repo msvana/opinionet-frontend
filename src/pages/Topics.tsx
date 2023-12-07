@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 type Topic = {
     id: number | null;
     name: string;
-    sentMean: number;
-    conPos: number;
-    conNeg: number;
+    meanSentiment: number;
+    levelPositivity: number;
+    levelNegativity: number;
     mass: number;
 };
 
@@ -26,7 +26,7 @@ async function fetctTopicsData(): Promise<TopicsResponse> {
 }
 
 function formatTopicData(
-    statistic: "sentMean" | "conPos" | "conNeg" | "mass",
+    statistic: "meanSentiment" | "levelPositivity" | "levelNegativity" | "mass",
     preferredDirection: "max" | "min",
     topics: TopicsResponse | null
 ) {
@@ -110,21 +110,21 @@ function Topics() {
                             },
                             {
                                 name: <b>Mean Sentiment</b>,
-                                selector: (row) => row.sentMean,
+                                selector: (row) => row.meanSentiment,
                                 sortable: true,
-                                format: formatTopicData("sentMean", "max", topics),
+                                format: formatTopicData("meanSentiment", "max", topics),
                             },
                             {
                                 name: <b>Positive Sentiment Level</b>,
-                                selector: (row) => row.conPos,
+                                selector: (row) => row.levelPositivity,
                                 sortable: true,
-                                format: formatTopicData("conPos", "max", topics),
+                                format: formatTopicData("levelPositivity", "max", topics),
                             },
                             {
                                 name: <b>Negative Sentiment Level</b>,
-                                selector: (row) => row.conNeg,
+                                selector: (row) => row.levelNegativity,
                                 sortable: true,
-                                format: formatTopicData("conNeg", "min", topics),
+                                format: formatTopicData("levelNegativity", "min", topics),
                             },
                             {
                                 name: <b>Discussion Volume</b>,
