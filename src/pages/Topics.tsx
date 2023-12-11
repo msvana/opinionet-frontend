@@ -2,15 +2,7 @@ import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { TableRow } from "react-data-table-component";
 import { Link } from "react-router-dom";
-
-type Topic = {
-    id: number | null;
-    name: string;
-    meanSentiment: number;
-    levelPositivity: number;
-    levelNegativity: number;
-    mass: number;
-};
+import type { Topic } from "../resources/Topic";
 
 type TopicsResponse = {
     topics: Topic[];
@@ -26,9 +18,10 @@ async function fetctTopicsData(): Promise<TopicsResponse> {
 }
 
 function formatTopicData(
-    statistic: "meanSentiment" | "levelPositivity" | "levelNegativity" | "mass",
+    statistic: "meanSentiment" | "levelPositivity" | "levelNegativity" | "mass" | "controversy",
     preferredDirection: "max" | "min",
-    topics: TopicsResponse | null
+    topics: TopicsResponse | null,
+    multiply: boolean = false
 ) {
     return function (row: TableRow) {
         if (!topics) {
@@ -66,7 +59,7 @@ function formatTopicData(
                         backgroundColor: backgroundColor,
                     }}
                 ></div>
-                {statisticValue.toFixed(3)}
+                {(multiply ? statisticValue * 100 : statisticValue).toFixed(3)}
             </>
         );
     };
@@ -112,19 +105,25 @@ function Topics() {
                                 name: <b>Mean Sentiment</b>,
                                 selector: (row) => row.meanSentiment,
                                 sortable: true,
-                                format: formatTopicData("meanSentiment", "max", topics),
+                                format: formatTopicData("meanSentiment", "max", topics, true),
                             },
                             {
                                 name: <b>Positive Sentiment Level</b>,
                                 selector: (row) => row.levelPositivity,
                                 sortable: true,
-                                format: formatTopicData("levelPositivity", "max", topics),
+                                format: formatTopicData("levelPositivity", "max", topics, true),
                             },
                             {
                                 name: <b>Negative Sentiment Level</b>,
                                 selector: (row) => row.levelNegativity,
                                 sortable: true,
-                                format: formatTopicData("levelNegativity", "min", topics),
+                                format: formatTopicData("levelNegativity", "min", topics, true),
+                            },
+                            {
+                                name: <b>Controversy</b>,
+                                selector: (row) => row.controversy,
+                                sortable: true,
+                                format: formatTopicData("controversy", "min", topics, true)
                             },
                             {
                                 name: <b>Discussion Volume</b>,
