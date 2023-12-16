@@ -1,21 +1,8 @@
-import { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
-import { TableRow } from "react-data-table-component";
-import { Link } from "react-router-dom";
-import type { Topic } from "../resources/Topic";
-
-type TopicsResponse = {
-    topics: Topic[];
-    max: Topic;
-    topQuantile: Topic;
-    bottomQuantile: Topic;
-};
-
-async function fetctTopicsData(): Promise<TopicsResponse> {
-    const request = await fetch(`http://localhost:8000/topics`);
-    const response = await request.json();
-    return response;
-}
+import {useEffect, useState} from "react";
+import DataTable, {TableRow} from "react-data-table-component";
+import {Link} from "react-router-dom";
+import type {TopicsResponse} from "../resources/Topic";
+import {TopicList} from "../resources/Topic";
 
 function formatTopicData(
     statistic: "meanSentiment" | "levelPositivity" | "levelNegativity" | "mass" | "controversy",
@@ -66,22 +53,15 @@ function formatTopicData(
 }
 
 function Topics() {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [topics, setTopics] = useState<TopicsResponse | null>(null);
+    const [topicsResponse, setTopicsResponse] = useState<TopicsResponse | null>(null);
 
-    async function fetchTopicsData() {
-        const topicsData = await fetctTopicsData();
-        setTopics(topicsData);
-        setLoading(false);
+    async function loadTopics() {
+        setTopicsResponse(await TopicList.getInstance().getTopics());
+        console.log(topicsResponse);
     }
 
     useEffect(() => {
-        if (loading || topics) {
-            return;
-        }
-
-        setLoading(true);
-        fetchTopicsData().catch(console.log);
+        loadTopics().catch(console.error);
     }, []);
 
     return (
@@ -105,34 +85,49 @@ function Topics() {
                                 name: <b>Mean Sentiment</b>,
                                 selector: (row) => row.meanSentiment,
                                 sortable: true,
-                                format: formatTopicData("meanSentiment", "max", topics, true),
+                                format: formatTopicData(
+                                    "meanSentiment",
+                                    "max",
+                                    topicsResponse,
+                                    true
+                                ),
                             },
                             {
                                 name: <b>Positive Sentiment Level</b>,
                                 selector: (row) => row.levelPositivity,
                                 sortable: true,
-                                format: formatTopicData("levelPositivity", "max", topics, true),
+                                format: formatTopicData(
+                                    "levelPositivity",
+                                    "max",
+                                    topicsResponse,
+                                    true
+                                ),
                             },
                             {
                                 name: <b>Negative Sentiment Level</b>,
                                 selector: (row) => row.levelNegativity,
                                 sortable: true,
-                                format: formatTopicData("levelNegativity", "min", topics, true),
+                                format: formatTopicData(
+                                    "levelNegativity",
+                                    "min",
+                                    topicsResponse,
+                                    true
+                                ),
                             },
                             {
                                 name: <b>Controversy</b>,
                                 selector: (row) => row.controversy,
                                 sortable: true,
-                                format: formatTopicData("controversy", "min", topics, true)
+                                format: formatTopicData("controversy", "min", topicsResponse, true),
                             },
                             {
                                 name: <b>Discussion Volume</b>,
                                 selector: (row) => row.mass,
                                 sortable: true,
-                                format: formatTopicData("mass", "max", topics),
+                                format: formatTopicData("mass", "max", topicsResponse),
                             },
                         ]}
-                        data={topics?.topics || []}
+                        data={topicsResponse?.topics || []}
                         customStyles={{
                             head: { style: { fontSize: "1rem" } },
                             rows: { style: { fontSize: "1rem", background: "none" } },

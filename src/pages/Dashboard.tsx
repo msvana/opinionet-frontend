@@ -1,7 +1,7 @@
-import Plot from "react-plotly.js";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import WordCloud from "react-d3-cloud";
-import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
+import Plot from "react-plotly.js";
+import {WordCloudData, fetchWordCloudData} from "../resources/WordCloud";
 
 type SentimentOverview = {
     name: string[];
