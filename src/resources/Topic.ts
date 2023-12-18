@@ -18,7 +18,7 @@ export type TopicsResponse = {
 
 export class TopicList {
     private static instance: TopicList;
-    private topicsResponse: TopicsResponse | null = null;
+    private topicsResponses: Map<string, TopicsResponse | null> = new Map();
 
     public static getInstance(): TopicList {
         if (!TopicList.instance) {
@@ -28,13 +28,13 @@ export class TopicList {
         return TopicList.instance;
     }
 
-    public async getTopics(): Promise<TopicsResponse | null> {
-        if (this.topicsResponse === null) {
-            const response = await fetch("http://localhost:8000/topics");
+    public async getTopics(city: string): Promise<TopicsResponse | null> {
+        if (!this.topicsResponses.has(city)) {
+            const response = await fetch(`http://localhost:8000/topics/${city}`);
             const json = await response.json();
-            this.topicsResponse = json;
+            this.topicsResponses.set(city, json);
         }
 
-        return this.topicsResponse;
+        return this.topicsResponses.get(city) || null;
     }
 }

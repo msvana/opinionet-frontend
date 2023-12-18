@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import WordCloud from "react-d3-cloud";
 import Plot from "react-plotly.js";
-import { useParams } from "react-router-dom";
-import { TopicList, Topic as TopicType, TopicsResponse } from "../resources/Topic";
-import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
+import {useParams} from "react-router-dom";
+import CityContext from "../resources/CityContext";
+import {TopicList, Topic as TopicType, TopicsResponse} from "../resources/Topic";
+import {WordCloudData, fetchWordCloudData} from "../resources/WordCloud";
 
 type RadarData = {
     values: number[];
     topicName: string;
 };
 
-async function fetchTopicData(topicId: number): Promise<TopicType> {
-    const request = await fetch(`http://localhost:8000/topic/${topicId}`);
+async function fetchTopicData(city: string, topicId: number): Promise<TopicType> {
+    const request = await fetch(`http://localhost:8000/topics/${city}/${topicId}`);
     const response = await request.json();
     return response;
 }
@@ -47,23 +48,24 @@ function Topic() {
 
     const [wordsPositive, setWordsNegative] = useState<WordCloudData[]>([]);
     const [wordsNegative, setWordsPositive] = useState<WordCloudData[]>([]);
+    const city = useContext(CityContext);
 
     const fetchData = async () => {
         if (topicIdNumber === null) {
             return;
         }
 
-        const topicData = await fetchTopicData(topicIdNumber);
-        const allTopicsData = await TopicList.getInstance().getTopics();
+        const topicData = await fetchTopicData(city, topicIdNumber);
+        const allTopicsData = await TopicList.getInstance().getTopics(city);
 
         setTopic(topicData);
         setAllTopics(allTopicsData);
         setRadarData([getTopicRadarData(topicData, allTopicsData?.max || null)]);
 
-        const positiveWordcloudData = await fetchWordCloudData("positive", topicIdNumber);
+        const positiveWordcloudData = await fetchWordCloudData(city, "positive", topicIdNumber);
         setWordsPositive(positiveWordcloudData);
 
-        const negativeWordcloudData = await fetchWordCloudData("negative", topicIdNumber);
+        const negativeWordcloudData = await fetchWordCloudData(city, "negative", topicIdNumber);
         setWordsNegative(negativeWordcloudData);
     };
 
@@ -82,13 +84,13 @@ function Topic() {
 
     useEffect(() => {
         fetchData().catch(console.log);
-    }, []);
+    }, [city]);
 
     return (
         <>
             <div className="row mt-3">
                 <div className="col-lg-6">
-                    <div className="bg-light border p-3" style={{height: "100%"}}>
+                    <div className="bg-light border p-3" style={{ height: "100%" }}>
                         <h1>{topic?.name || ""}</h1>
                         <p>{topic?.topWords || ""}</p>
 
@@ -145,13 +147,15 @@ function Topic() {
                                         "Level of negativity",
                                         "Controversy",
                                         "Volume of discussion",
-                                        "Mean sentiment"
+                                        "Mean sentiment",
                                     ],
                                     fill: "toself",
                                     name: data.topicName,
                                 })) || []
                             }
                             layout={{
+                                paper_bgcolor: "#f8f9fa",
+                                plot_bgcolor: "#f8f9fa",
                                 polar: {
                                     radialaxis: {
                                         visible: true,
@@ -159,6 +163,7 @@ function Topic() {
                                     },
                                 },
                                 showlegend: false,
+                                autosize: true,
                             }}
                         />
                     </div>

@@ -1,7 +1,8 @@
-import {useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import WordCloud from "react-d3-cloud";
 import Plot from "react-plotly.js";
-import {WordCloudData, fetchWordCloudData} from "../resources/WordCloud";
+import CityContext from "../resources/CityContext";
+import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
 
 type SentimentOverview = {
     name: string[];
@@ -11,8 +12,8 @@ type SentimentOverview = {
     mass: number[];
 };
 
-async function fetchSentimentOverview(): Promise<SentimentOverview> {
-    const request = await fetch("http://localhost:8000/sentiment-overview");
+async function fetchSentimentOverview(city: string): Promise<SentimentOverview> {
+    const request = await fetch(`http://localhost:8000/sentiment-overview/${city}`);
     const response = await request.json();
     return response;
 }
@@ -21,29 +22,22 @@ function Dashboard() {
     const [sentimentOverview, setSentimentOverview] = useState<SentimentOverview | null>(null);
     const [wordsPositive, setWordsPositive] = useState<WordCloudData[]>([]);
     const [wordsNegative, setWordsNegative] = useState<WordCloudData[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const city = useContext(CityContext);
 
     const fetchData = async () => {
-        const sentimentOverviewData = await fetchSentimentOverview();
+        const sentimentOverviewData = await fetchSentimentOverview(city);
         setSentimentOverview(sentimentOverviewData);
 
-        const positiveWordcloudData = await fetchWordCloudData("positive");
+        const positiveWordcloudData = await fetchWordCloudData(city, "positive");
         setWordsPositive(positiveWordcloudData);
 
-        const negativeWordcloudData = await fetchWordCloudData("negative");
+        const negativeWordcloudData = await fetchWordCloudData(city, "negative");
         setWordsNegative(negativeWordcloudData);
-
-        setLoading(false);
     };
 
     useEffect(() => {
-        if (sentimentOverview || loading) {
-            return;
-        }
-
-        setLoading(true);
         fetchData().catch(console.log);
-    }, [sentimentOverview, wordsPositive, loading]);
+    }, [city]);
 
     return (
         <>

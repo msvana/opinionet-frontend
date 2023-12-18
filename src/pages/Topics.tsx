@@ -1,6 +1,7 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import DataTable, {TableRow} from "react-data-table-component";
 import {Link} from "react-router-dom";
+import CityContext from "../resources/CityContext";
 import type {TopicsResponse} from "../resources/Topic";
 import {TopicList} from "../resources/Topic";
 
@@ -54,15 +55,16 @@ function formatTopicData(
 
 function Topics() {
     const [topicsResponse, setTopicsResponse] = useState<TopicsResponse | null>(null);
+    const city = useContext(CityContext);
 
     async function loadTopics() {
-        setTopicsResponse(await TopicList.getInstance().getTopics());
+        setTopicsResponse(await TopicList.getInstance().getTopics(city));
         console.log(topicsResponse);
     }
 
     useEffect(() => {
         loadTopics().catch(console.error);
-    }, []);
+    }, [city]);
 
     return (
         <div className="row">
