@@ -160,6 +160,7 @@ function Topic() {
                         </select>
 
                         <Plot
+                            className="stretchy-plot"
                             data={
                                 radarData.map((data) => ({
                                     type: "scatterpolar",
@@ -185,9 +186,13 @@ function Topic() {
                                         range: [0, 1],
                                     },
                                 },
-                                showlegend: false,
+                                showlegend: true,
                                 autosize: true,
+                                legend: {
+                                    orientation: "h",
+                                },
                             }}
+                            config={{ responsive: true }}
                         />
                     </div>
                 </div>

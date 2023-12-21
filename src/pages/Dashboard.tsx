@@ -52,7 +52,7 @@ function Dashboard() {
                         </p>
                         <div className="text-center">
                             <Plot
-                                className="sentiment-overview"
+                                className="stretchy-plot"
                                 data={[
                                     {
                                         x: sentimentOverview?.name,

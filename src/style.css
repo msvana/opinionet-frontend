@@ -10,9 +10,9 @@ h1 {
     font-size: 1.8em;
 }
 
-.sentiment-overview,
-.sentiment-overview .plot-container,
-.sentiment-overview .plot-container .svg-container {
+.stretchy-plot,
+.stretchy-plot .plot-container,
+.stretchy-plot .plot-container .svg-container {
     width: 100% !important;
     height: 550px;
 }
