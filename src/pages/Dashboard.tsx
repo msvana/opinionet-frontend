@@ -42,7 +42,7 @@ function Dashboard() {
     return (
         <>
             <div className="row">
-                <div className="col">
+                <div className="col pt-3">
                     <div className="bg-light border p-3">
                         <h1>Topic sentiment</h1>
                         <p>
@@ -105,8 +105,8 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="row mt-3">
-                <div className="col-lg-6">
+            <div className="row">
+                <div className="col-lg-6 pt-3">
                     <div className="bg-light border p-3">
                         <h1>Word cloud for Positive tweets</h1>
                         <p>Most common words used in positive posts published from Ostrava</p>
@@ -118,7 +118,7 @@ function Dashboard() {
                         />
                     </div>
                 </div>
-                <div className="col-lg-6">
+                <div className="col-lg-6 pt-3">
                     <div className="bg-light border p-3">
                         <h1>Word cloud for Negative tweets</h1>
                         <p>Most common words used in negative posts published from Ostrava</p>

@@ -10,6 +10,10 @@ h1 {
     font-size: 1.8em;
 }
 
+h2 {
+    font-size: 1.3em;
+}
+
 .stretchy-plot,
 .stretchy-plot .plot-container,
 .stretchy-plot .plot-container .svg-container {

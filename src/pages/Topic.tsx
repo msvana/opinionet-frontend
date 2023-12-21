@@ -111,8 +111,8 @@ function Topic() {
 
     return (
         <>
-            <div className="row mt-3">
-                <div className="col-lg-6">
+            <div className="row">
+                <div className="col-lg-6 pt-3">
                     <div className="bg-light border p-3" style={{ height: "100%" }}>
                         <h1>{topic?.name || ""}</h1>
                         <p>{topic?.topWords || ""}</p>
@@ -141,12 +141,8 @@ function Topic() {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
 
-                <div className="col-lg-6">
-                    <div className="bg-light border p-3">
-                        <h1>Compare with another topic</h1>
+                        <h2>Compare with another topic</h2>
 
                         <select onChange={changeOtherTopic}>
                             <option value={-1}>Select topic ...</option>
@@ -196,27 +192,24 @@ function Topic() {
                         />
                     </div>
                 </div>
-            </div>
-
-            <div className="row mt-3">
-                <div className="col-lg-6">
-                    <div className="bg-light border p-3" style={{ height: "100%" }}>
-                        <h1>Summary of positive tweets</h1>
+                <div className="col-lg-6 pt-3">
+                    <div className="bg-light border p-3" style={{ height: "50%" }}>
+                        <h1 className="text-success">Summary of positive tweets</h1>
                         <p>{summaryPositive}</p>
                     </div>
-                </div>
-                <div className="col-lg-6">
-                    <div className="bg-light border p-3" style={{ height: "100%" }}>
-                        <h1>Summary of negative tweets</h1>
-                        <p>{summaryNegative}</p>
+                    <div className="pt-3" style={{ height: "50%" }}>
+                        <div className="bg-light border p-3" style={{ height: "100%" }}>
+                            <h1 className="text-danger">Summary of negative tweets</h1>
+                            <p>{summaryNegative}</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="row mt-3">
-                <div className="col-lg-6">
+            <div className="row">
+                <div className="col-lg-6 pt-3">
                     <div className="bg-light border p-3" style={{ height: "100%" }}>
-                        <h1>Word cloud for Positive tweets</h1>
+                        <h1 className="text-success">Word cloud for positive tweets</h1>
                         <p>Most common words used in positive posts on this topic</p>
                         <WordCloud
                             data={wordsPositive}
@@ -226,9 +219,9 @@ function Topic() {
                         />
                     </div>
                 </div>
-                <div className="col-lg-6">
+                <div className="col-lg-6 pt-3">
                     <div className="bg-light border p-3" style={{ height: "100%" }}>
-                        <h1>Word cloud for Negative tweets</h1>
+                        <h1 className="text-danger">Word cloud for negative tweets</h1>
                         <p>Most common words used in negative posts on this topic</p>
                         <WordCloud
                             data={wordsNegative}
