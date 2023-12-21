@@ -1,18 +1,32 @@
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import WordCloud from "react-d3-cloud";
 import Plot from "react-plotly.js";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CityContext from "../resources/CityContext";
-import {TopicList, Topic as TopicType, TopicsResponse} from "../resources/Topic";
-import {WordCloudData, fetchWordCloudData} from "../resources/WordCloud";
+import { TopicList, Topic as TopicType, TopicsResponse } from "../resources/Topic";
+import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
 
 type RadarData = {
     values: number[];
     topicName: string;
 };
 
+type SummaryResponse = {
+    summary: string;
+};
+
 async function fetchTopicData(city: string, topicId: number): Promise<TopicType> {
     const request = await fetch(`http://localhost:8000/topics/${city}/${topicId}`);
+    const response = await request.json();
+    return response;
+}
+
+async function fetchSummaryData(
+    city: string,
+    topicId: number,
+    sentiment: string
+): Promise<SummaryResponse> {
+    const request = await fetch(`http://localhost:8000/summary/${city}/${topicId}/${sentiment}`);
     const response = await request.json();
     return response;
 }
@@ -41,6 +55,7 @@ function getTopicRadarData(topic: TopicType | null, maxValues: TopicType | null)
 function Topic() {
     const { topicId } = useParams<{ topicId: string }>();
     const topicIdNumber = topicId !== undefined ? parseInt(topicId) : null;
+    const city = useContext(CityContext);
 
     const [allTopics, setAllTopics] = useState<TopicsResponse | null>(null);
     const [topic, setTopic] = useState<TopicType | null>(null);
@@ -48,7 +63,9 @@ function Topic() {
 
     const [wordsPositive, setWordsNegative] = useState<WordCloudData[]>([]);
     const [wordsNegative, setWordsPositive] = useState<WordCloudData[]>([]);
-    const city = useContext(CityContext);
+
+    const [summaryPositive, setSummaryPositive] = useState<string>("Loading ...");
+    const [summaryNegative, setSummaryNegative] = useState<string>("Loading ...");
 
     const fetchData = async () => {
         if (topicIdNumber === null) {
@@ -67,6 +84,12 @@ function Topic() {
 
         const negativeWordcloudData = await fetchWordCloudData(city, "negative", topicIdNumber);
         setWordsNegative(negativeWordcloudData);
+
+        const summaryPositiveData = await fetchSummaryData(city, topicIdNumber, "positive");
+        setSummaryPositive(summaryPositiveData.summary);
+
+        const summaryNegativeData = await fetchSummaryData(city, topicIdNumber, "negative");
+        setSummaryNegative(summaryNegativeData.summary);
     };
 
     function changeOtherTopic(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -172,7 +195,22 @@ function Topic() {
 
             <div className="row mt-3">
                 <div className="col-lg-6">
-                    <div className="bg-light border p-3">
+                    <div className="bg-light border p-3" style={{ height: "100%" }}>
+                        <h1>Summary of positive tweets</h1>
+                        <p>{summaryPositive}</p>
+                    </div>
+                </div>
+                <div className="col-lg-6">
+                    <div className="bg-light border p-3" style={{ height: "100%" }}>
+                        <h1>Summary of negative tweets</h1>
+                        <p>{summaryNegative}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="row mt-3">
+                <div className="col-lg-6">
+                    <div className="bg-light border p-3" style={{ height: "100%" }}>
                         <h1>Word cloud for Positive tweets</h1>
                         <p>Most common words used in positive posts on this topic</p>
                         <WordCloud
@@ -184,7 +222,7 @@ function Topic() {
                     </div>
                 </div>
                 <div className="col-lg-6">
-                    <div className="bg-light border p-3">
+                    <div className="bg-light border p-3" style={{ height: "100%" }}>
                         <h1>Word cloud for Negative tweets</h1>
                         <p>Most common words used in negative posts on this topic</p>
                         <WordCloud
