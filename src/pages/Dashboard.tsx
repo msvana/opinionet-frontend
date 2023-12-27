@@ -98,7 +98,7 @@ function Dashboard() {
                                     xaxis: { tickangle: 45 },
                                     showlegend: false,
                                 }}
-                                config={{ responsive: true }}
+                                config={{ responsive: true, displayModeBar: false }}
                             />
                         </div>
                     </div>

@@ -1,9 +1,9 @@
-import {useContext, useEffect, useState} from "react";
-import DataTable, {TableRow} from "react-data-table-component";
-import {Link} from "react-router-dom";
+import { useContext, useEffect, useMemo, useState } from "react";
+import DataTable, { TableRow } from "react-data-table-component";
+import { Link } from "react-router-dom";
 import CityContext from "../resources/CityContext";
-import type {TopicsResponse} from "../resources/Topic";
-import {TopicList} from "../resources/Topic";
+import type { TopicsResponse } from "../resources/Topic";
+import { TopicList, Topic } from "../resources/Topic";
 
 function formatTopicData(
     statistic: "meanSentiment" | "levelPositivity" | "levelNegativity" | "mass" | "controversy",
@@ -57,9 +57,50 @@ function Topics() {
     const [topicsResponse, setTopicsResponse] = useState<TopicsResponse | null>(null);
     const city = useContext(CityContext);
 
+    const columns = useMemo(
+        () => [
+            {
+                name: <b>Topic</b>,
+                format: (row: Topic) => <Link to={"/topic/" + row.id}>{row.name}</Link>,
+                selector: (row: Topic) => row.name,
+                grow: 2,
+            },
+            {
+                name: <b>Mean Sentiment</b>,
+                selector: (row: Topic) => row.meanSentiment,
+                sortable: true,
+                format: formatTopicData("meanSentiment", "max", topicsResponse, true),
+            },
+            {
+                name: <b>Positive Sentiment Level</b>,
+                selector: (row: Topic) => row.levelPositivity,
+                sortable: true,
+                format: formatTopicData("levelPositivity", "max", topicsResponse, true),
+            },
+            {
+                name: <b>Negative Sentiment Level</b>,
+                selector: (row: Topic) => row.levelNegativity,
+                sortable: true,
+                format: formatTopicData("levelNegativity", "min", topicsResponse, true),
+            },
+            {
+                name: <b>Controversy</b>,
+                selector: (row: Topic) => row.controversy,
+                sortable: true,
+                format: formatTopicData("controversy", "min", topicsResponse, true),
+            },
+            {
+                name: <b>Discussion Volume</b>,
+                selector: (row: Topic) => row.mass,
+                sortable: true,
+                format: formatTopicData("mass", "max", topicsResponse),
+            },
+        ],
+        [topicsResponse]
+    );
+
     async function loadTopics() {
         setTopicsResponse(await TopicList.getInstance().getTopics(city));
-        console.log(topicsResponse);
     }
 
     useEffect(() => {
@@ -72,63 +113,11 @@ function Topics() {
                 <div className="bg-light border p-3">
                     <h1>Topics</h1>
                     <p>
-                        The table lists all topics detected in tweets from Ostrava. Click the topic
+                        The table lists all topics detected in tweets from {city[0].toUpperCase() + city.slice(1)}. Click the topic
                         name to explore it in more detail.
                     </p>
                     <DataTable
-                        columns={[
-                            {
-                                name: <b>Topic</b>,
-                                format: (row) => <Link to={"/topic/" + row.id}>{row.name}</Link>,
-                                selector: (row) => row.name,
-                                grow: 2,
-                            },
-                            {
-                                name: <b>Mean Sentiment</b>,
-                                selector: (row) => row.meanSentiment,
-                                sortable: true,
-                                format: formatTopicData(
-                                    "meanSentiment",
-                                    "max",
-                                    topicsResponse,
-                                    true
-                                ),
-                            },
-                            {
-                                name: <b>Positive Sentiment Level</b>,
-                                selector: (row) => row.levelPositivity,
-                                sortable: true,
-                                format: formatTopicData(
-                                    "levelPositivity",
-                                    "max",
-                                    topicsResponse,
-                                    true
-                                ),
-                            },
-                            {
-                                name: <b>Negative Sentiment Level</b>,
-                                selector: (row) => row.levelNegativity,
-                                sortable: true,
-                                format: formatTopicData(
-                                    "levelNegativity",
-                                    "min",
-                                    topicsResponse,
-                                    true
-                                ),
-                            },
-                            {
-                                name: <b>Controversy</b>,
-                                selector: (row) => row.controversy,
-                                sortable: true,
-                                format: formatTopicData("controversy", "min", topicsResponse, true),
-                            },
-                            {
-                                name: <b>Discussion Volume</b>,
-                                selector: (row) => row.mass,
-                                sortable: true,
-                                format: formatTopicData("mass", "max", topicsResponse),
-                            },
-                        ]}
+                        columns={columns}
                         data={topicsResponse?.topics || []}
                         customStyles={{
                             head: { style: { fontSize: "1rem" } },
