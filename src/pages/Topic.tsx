@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import WordCloud from "react-d3-cloud";
 import Plot from "react-plotly.js";
-import { useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
+import {BACKEND_URL} from "../Config";
 import CityContext from "../resources/CityContext";
-import { TopicList, Topic as TopicType, TopicsResponse } from "../resources/Topic";
-import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
+import {TopicList, Topic as TopicType, TopicsResponse} from "../resources/Topic";
+import {WordCloudData, fetchWordCloudData} from "../resources/WordCloud";
 
 type RadarData = {
     values: number[];
@@ -16,7 +17,7 @@ type SummaryResponse = {
 };
 
 async function fetchTopicData(city: string, topicId: number): Promise<TopicType> {
-    const request = await fetch(`http://localhost:8000/topics/${city}/${topicId}`);
+    const request = await fetch(`${BACKEND_URL}/topics/${city}/${topicId}`);
     const response = await request.json();
     return response;
 }
@@ -26,7 +27,7 @@ async function fetchSummaryData(
     topicId: number,
     sentiment: string
 ): Promise<SummaryResponse> {
-    const request = await fetch(`http://localhost:8000/summary/${city}/${topicId}/${sentiment}`);
+    const request = await fetch(`${BACKEND_URL}/summary/${city}/${topicId}/${sentiment}`);
     const response = await request.json();
     return response;
 }

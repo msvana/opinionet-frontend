@@ -1,3 +1,5 @@
+import { BACKEND_URL } from "../Config";
+
 export type Topic = {
     id: number | null;
     name: string;
@@ -30,7 +32,7 @@ export class TopicList {
 
     public async getTopics(city: string): Promise<TopicsResponse | null> {
         if (!this.topicsResponses.has(city)) {
-            const response = await fetch(`http://localhost:8000/topics/${city}`);
+            const response = await fetch(`${BACKEND_URL}/topics/${city}`);
             const json = await response.json();
             this.topicsResponses.set(city, json);
         }

@@ -3,6 +3,7 @@ import WordCloud from "react-d3-cloud";
 import Plot from "react-plotly.js";
 import CityContext from "../resources/CityContext";
 import { WordCloudData, fetchWordCloudData } from "../resources/WordCloud";
+import { BACKEND_URL } from "../Config";
 
 type SentimentOverview = {
     name: string[];
@@ -13,7 +14,7 @@ type SentimentOverview = {
 };
 
 async function fetchSentimentOverview(city: string): Promise<SentimentOverview> {
-    const request = await fetch(`http://localhost:8000/sentiment-overview/${city}`);
+    const request = await fetch(`${BACKEND_URL}/sentiment-overview/${city}`);
     const response = await request.json();
     return response;
 }
